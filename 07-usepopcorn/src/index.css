@@ -54,7 +54,8 @@ body {
   max-width: 42rem;
   background-color: var(--color-background-500);
   border-radius: 0.9rem;
-  /* overflow: scroll; */
+  overflow-y: scroll;
+  scrollbar-width: none;
   position: relative;
 }
 
@@ -305,6 +306,22 @@ body {
 
 .btn-add:hover {
   background-color: var(--color-primary-light);
+}
+
+.btn-delete-in-details {
+  background-color: var(--color-red);
+  color: var(--color-text);
+  border: none;
+  border-radius: 10rem;
+  font-size: 1.4rem;
+  padding: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-delete-in-details:hover {
+  background-color: var(--color-red-dark);
 }
 
 .seconds {

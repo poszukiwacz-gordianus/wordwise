@@ -1,10 +1,18 @@
 import WatchedMovie from "./watched-movie";
 
-export default function WatchedMovieList({ watched }) {
+export default function WatchedMovieList({
+  watched,
+  onSelectedMovie,
+  onRemoveFromWatched,
+}) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {watched.map((movie) => (
-        <WatchedMovie movie={movie} key={movie.imdbID} />
+        <WatchedMovie
+          movie={movie}
+          key={movie.imdbID}
+          onSelectedMovie={onSelectedMovie}
+        />
       ))}
     </ul>
   );
