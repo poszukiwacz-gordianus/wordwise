@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./star-rating";
 import Loader from "./loader";
-const API_KEY = "b0a76f1d";
+import { useKey } from "../hooks/useKey";
+import { useMovieDetails } from "../hooks/useMovieDetails";
 
 export default function MovieDetails({
   selectedId,
@@ -11,10 +12,17 @@ export default function MovieDetails({
   onUpdateUserRating,
   onRemoveFromWatched,
 }) {
-  const [movie, setMovie] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+
+  const countRef = useRef(0);
+
+  useKey("Escape", "keydown", onCloseMovie);
+  const { movie, isLoading } = useMovieDetails(selectedId);
+
+  useEffect(() => {
+    if (userRating) countRef.current++;
+  }, [userRating]);
 
   const {
     Title: title,
@@ -29,50 +37,9 @@ export default function MovieDetails({
     Genre: genre,
   } = movie;
 
-  useEffect(() => {
-    async function getMovieDetails() {
-      try {
-        setIsLoading(true);
-
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${API_KEY}&i=${selectedId}`
-        );
-
-        if (!res.ok)
-          throw new Error(
-            "Something went wrong with fetching movies. Reload the page."
-          );
-
-        const data = await res.json();
-
-        if (data.Response === "False") throw new Error("Error");
-        setMovie(data);
-      } catch (err) {
-        console.error(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    getMovieDetails();
-  }, [selectedId]);
-
-  useEffect(() => {
-    function callback(e) {
-      if (e.code === "Escape") {
-        onCloseMovie();
-      }
-    }
-    document.addEventListener("keydown", callback);
-
-    return () => {
-      document.removeEventListener("keydown", callback);
-    };
-  }, [onCloseMovie]);
-
   function handleRating(rating) {
     setUserRating(rating);
-    onUpdateUserRating(rating, selectedId);
+    onUpdateUserRating(rating, 1, selectedId);
   }
 
   function handleAddToWatched() {
@@ -86,6 +53,7 @@ export default function MovieDetails({
       imdbRating: Number(imdbRating),
       userRating: userRating,
       runtime: Number(runtime.split(" ").at(0)),
+      countRatingDecisions: countRef.current,
     };
     onAddToWatched(newWatchedMovie);
   }
