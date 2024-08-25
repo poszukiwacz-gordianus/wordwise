@@ -1,5 +1,10 @@
 import PropTypes from "prop-types";
 import styles from "./City.module.css";
+import { useParams } from "react-router-dom";
+import { useCities } from "../contexts/CityContext";
+import { useEffect } from "react";
+import Spinner from "./Spinner";
+import ButtonBack from "./ButtonBack";
 
 City.propTypes = {
   currentCity: PropTypes.object,
@@ -13,20 +18,20 @@ const formatDate = (date) =>
   }).format(new Date(date));
 
 function City() {
-  // TEMP DATA
-  const currentCity = {
-    cityName: "Lisbon",
-    emoji: "🇵🇹",
-    date: "2027-10-31T15:59:59.138Z",
-    notes: "My favorite city so far!",
-  };
+  const { id } = useParams();
+  const { getCity, currentCity, isLoading } = useCities();
+
+  useEffect(() => {
+    getCity(id);
+  }, [id, getCity]);
+
+  if (isLoading) return <Spinner />;
 
   const { cityName, emoji, date, notes } = currentCity;
 
   return (
     <div className={styles.city}>
-      city
-      {/* <div className={styles.row}>
+      <div className={styles.row}>
         <h6>City name</h6>
         <h3>
           <span>{emoji}</span> {cityName}
@@ -54,7 +59,10 @@ function City() {
         >
           Check out {cityName} on Wikipedia &rarr;
         </a>
-      </div> */}
+      </div>
+      <div>
+        <ButtonBack />
+      </div>
     </div>
   );
 }
